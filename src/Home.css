@@ -1,0 +1,24 @@
+#root {
+  min-width:850px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+#main{
+  display:flex
+}
+
+#list{
+  width: 30%;
+  padding-right:5px;
+}
+
+#map {
+  width: 70%;
+}
+
+#address-input{
+  position:absolute;
+  z-index: 1;
+}

@@ -1,0 +1,27 @@
+#entry{
+    border-color:white;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+    display:flex;
+    margin-bottom:5px;
+    transition:background-color 1s ;
+
+}
+
+#entry:hover{
+    cursor:pointer;
+    background-color: rgb(73, 72, 72);
+}
+
+#entry-info{
+    width:70%;
+    text-align: center;
+    font-weight:600;
+    font-size:small;
+     margin:auto
+}
+
+img{
+    padding:5px
+}
