@@ -7,7 +7,7 @@ const Modal = (props) => {
         title, 
         address, 
         year_built, 
-        curr_assesment, 
+        value, 
         property_type} = props.marker
 
     const pos = {
@@ -22,7 +22,7 @@ const Modal = (props) => {
 
     return (
     <div id="modal" style={pos}>
-        <img src={`../public/${property_type}.png`} height="100px"/>
+        <img src={`./${property_type}.png`} height="100px"/>
         <div id="modal-info">
             <div id="modal-info-line"><div id="value">{title}</div><div id="label">Title</div></div>
             <div id="line"></div>
@@ -30,9 +30,9 @@ const Modal = (props) => {
             <div id="line"></div>
             <div id="modal-info-line"><div id="value">{year_built}</div><div id="label">Year Built</div></div>
             <div id="line"></div>
-            <div id="modal-info-line"><div id="value">{cad.format(curr_assesment)}</div><div id="label">Current Value</div></div>
+            <div id="modal-info-line"><div id="value">{cad.format(value)}</div><div id="label">Current Value</div></div>
             <div id="line"></div>
-            <div id="modal-info-line"><div id="value">{property_type}</div><div id="label">Type</div></div>
+            <div id="modal-info-line"><div id="value">{property_type[0].toUpperCase() + property_type.slice(1)}</div><div id="label">Type</div></div>
         </div>
     </div>)
 }

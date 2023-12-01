@@ -7,7 +7,7 @@
     transition: top 1s, left 1s, opacity 1s;
     border-radius: 5px;
     animation: fadeIn 1s;
-    z-index: 2;
+    z-index: 3;
     display: flex;
 }
 
