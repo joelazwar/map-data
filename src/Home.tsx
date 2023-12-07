@@ -7,6 +7,7 @@ import useMousePosition from './utilities/useMousePosition.tsx'
 import axios from 'axios'
 import Entry from './Entry.tsx'
 import { listMarkers, writeEntry } from './utilities/ddbDoc.ts'
+import Form from './Form.tsx'
 
 const Home = () => {
 
@@ -19,14 +20,10 @@ const Home = () => {
 
   const [newMarker, setNewMarker] = useState(<></>)
   const [newMarkerOn, setNewMarkerOn] = useState(false)
-  const [name, setName] = useState("")
-  const [address, setAddress] = useState("")
-  const [postalCode, setPostalCode] = useState("")
-  const [value, setValue] = useState(0)
-  const [sqf, setSqf] = useState(0)
-  const [yearBuilt, setYearBuilt] = useState(new Date().getFullYear())
-  const [propType, setPropType] = useState("residential")
-  const [coord, setCoord] = useState<[number, number]>([0,0])
+  const name= useRef("")
+  const address = useRef("")
+  const postalCode = useRef("")
+  const coord = useRef<[number, number]>([0,0])
 
   const pos = useMousePosition();
 
@@ -72,14 +69,9 @@ const Home = () => {
   const resetForm = () => {
     setNewMarker(<></>)
     setNewMarkerOn(false)
-    setName("")
-    setAddress("")
-    setPostalCode("")
-    setValue(0)
-    setSqf(0)
-    setYearBuilt(new Date().getFullYear())
-    setPropType("residential")
-    setCoord([0,0])
+    name.current = ""
+    address.current = ""
+    postalCode.current = ""
   }
 
   const handleNewMarker = async (event, latLng:[number,number], pixel) =>{
@@ -91,20 +83,19 @@ const Home = () => {
     try{
       const {data} = await axios.get(`https://geocode.maps.co/reverse?lat=${latLng[0]}&lon=${latLng[1]}`)
 
-      const {address} = data
 
       console.log(data)
 
 
-      if(isNaN(data.display_name[0])) setName(data.display_name.split(',')[0]); else setName("")
+      name.current = isNaN(data.display_name[0]) ? data.display_name.split(',')[0] : ""
+      address.current = ((data.address["house_number"] || "") + " " + data.address["road"]).trim()
+      postalCode.current = data.address["postcode"]
+      coord.current = latLng
 
-      setAddress(((address["house_number"] || "") + " " + address["road"]).trim())
-      setPostalCode(address["postcode"])
       setNewMarker(<Marker width={50} anchor={latLng}/>)
       setNewMarkerOn(true)
       setCenter(latLng)
       setZoom(17)
-      setCoord(latLng)
     }
     catch (err){
       console.error(err)
@@ -114,24 +105,10 @@ const Home = () => {
 
   }
 
-  const handleFormSubmit = async (e) => {
-    e.preventDefault()
+  const handleFormSubmit = async (object:any) => {
 
-    const id =  crypto.randomUUID()
-
-    const object = {
-        id : id,
-        title : name,
-        address : address,
-        postal_code : postalCode,
-        coordinates : coord,
-        value: value,
-        square_footage: sqf,
-        property_type: propType,
-        year_built: yearBuilt
-    }
-
-    console.log(object)
+    console.log("Writing entry: ", object)
+    
     try{
       
       const res = await writeEntry(object)
@@ -170,37 +147,19 @@ const Home = () => {
     </div>
       <div id="main">
         <div id="list">
-            {markers.map(marker => <Entry marker={marker} handleEntryClick={handleEntryClick}/>)}
+            {markers.map((marker, index) => <Entry key={index} marker={marker} handleEntryClick={handleEntryClick}/>)}
         </div>
         <div id="map">
           <form onSubmit={(e)=>handleSearch(e)}>
             <input id="address-input" ref={search} type="text" placeholder='Address' name="search"/>
           </form>
           {newMarkerOn? 
-          <div id="new-marker-form">
-            <form style={{display:"block"}} onSubmit={(e)=>handleFormSubmit(e)}>
-              <label>Name</label>
-              <input onChange={(e)=>setName(e.currentTarget.value)} value={name} type="text"/>
-              <label>Address</label>
-              <input onChange={(e)=>setAddress(e.currentTarget.value)} value={address} type="text"/>
-              <label>Postal Code</label>
-              <input onChange={(e)=>setPostalCode(e.currentTarget.value)} value={postalCode} type="text"/>
-              <label>Square Footage {"("}m<sup>2</sup>{")"}</label>
-              <input onChange={(e)=>setSqf(e.currentTarget.valueAsNumber)} value={sqf} type="number"/>
-              <label>Value</label>
-              <input onChange={(e)=>setValue(e.currentTarget.valueAsNumber)} value={value} type="number"/>
-              <label>Year Built</label>
-              <input onChange={(e)=>setYearBuilt(e.currentTarget.valueAsNumber)} value={yearBuilt} type="number"/>
-              <label>Type</label>
-              <select onChange={(e)=>setPropType(e.target.value)} defaultValue="residential">
-                <option value="residential">Residential</option>
-                <option value="commercial">Commercial</option>
-                <option value="industrial">Industrial</option>
-              </select>
-              <button style={{position:"absolute", bottom:"2%", left:"25%", backgroundColor:"#2e2e2e"}} type="submit">Submit</button>
-            </form>
-          </div>
-          :<></>}
+          <Form 
+          handleFormSubmit={handleFormSubmit} 
+          latLng={coord.current}
+          initName={name.current}
+          initAddress={address.current}
+          initPostalCode={postalCode.current}/>:<></>}
           <Map 
           height={500} 
           center={center} 
@@ -212,15 +171,15 @@ const Home = () => {
             if(!animating){
               setNewMarker(<></>)
               setNewMarkerOn(false)
-              setCoord([0,0])
             }
           }} 
           onClick = {({event, latLng, pixel})=>handleNewMarker(event, latLng, pixel)}
           onAnimationStart={()=>setAnimating(true)}
           onAnimationStop={()=>setTimeout(()=>setAnimating(false),1000)}
           >
-            {markers?.map(marker=>
+            {markers?.map((marker,index)=>
               <Marker 
+              key={index}
               width={50}
               anchor={[marker.coordinates[0], marker.coordinates[1]]} 
               onMouseOver={()=>handleHover(marker, pos)}

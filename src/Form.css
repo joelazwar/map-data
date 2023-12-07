@@ -1,0 +1,15 @@
+#new-marker-form{
+    background-color: black; 
+    height: 500px;
+    position: absolute;
+    z-index: 3;
+    width:30%;
+    left:70%;
+    animation: formAppear 1s;
+  }
+  
+  @keyframes formAppear {
+    0% { opacity: 0%; left: 80%}
+    100% { opacity: 100%; left: 70% }
+  }
+  
