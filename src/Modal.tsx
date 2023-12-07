@@ -1,18 +1,23 @@
 import './Modal.css'
 //import useMousePosition from './useMousePosition';
 
-const Modal = (props) => {
+interface ModalProps{
+    pos:{x:number,y:number},
+    marker:any
+}
+
+const Modal = ({pos, marker}:ModalProps) => {
 
     const {
         title, 
         address, 
         year_built, 
         value, 
-        property_type} = props.marker
+        property_type} = marker
 
-    const pos = {
-        top: props.pos["y"] - 100,
-        left: props.pos["x"] + 25
+    const position = {
+        top: pos["y"] - 100,
+        left: pos["x"] + 25
     }
 
     let cad = new Intl.NumberFormat('en-US', {
@@ -21,7 +26,7 @@ const Modal = (props) => {
     });
 
     return (
-    <div id="modal" style={pos}>
+    <div id="modal" style={position}>
         <img src={`./${property_type}.png`} height="100px"/>
         <div id="modal-info">
             <div id="modal-info-line"><div id="value">{title}</div><div id="label">Title</div></div>

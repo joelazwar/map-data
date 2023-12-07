@@ -33,7 +33,7 @@ const Home = () => {
 
     console.log(data)
 
-    setMarkers(data)
+    if (data) setMarkers(data)
 
   }, [])
 
@@ -46,7 +46,7 @@ const Home = () => {
   
   const handleOut = () => setModal(<></>)
 
-  const handleSearch = async (e) => {
+  const handleSearch = async (e:React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try{
@@ -74,7 +74,7 @@ const Home = () => {
     postalCode.current = ""
   }
 
-  const handleNewMarker = async (event, latLng:[number,number], pixel) =>{
+  const handleNewMarker = async (latLng:[number,number]) =>{
     if(newMarkerOn){
       resetForm()
       return
@@ -173,7 +173,7 @@ const Home = () => {
               setNewMarkerOn(false)
             }
           }} 
-          onClick = {({event, latLng, pixel})=>handleNewMarker(event, latLng, pixel)}
+          onClick = {({latLng})=>handleNewMarker(latLng)}
           onAnimationStart={()=>setAnimating(true)}
           onAnimationStop={()=>setTimeout(()=>setAnimating(false),1000)}
           >

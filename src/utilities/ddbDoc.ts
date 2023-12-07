@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommandInput, ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, PutCommand, QueryCommandInput, ScanCommand } from "@aws-sdk/lib-dynamodb";
 
 const getCredentials = () => {
     if (import.meta.env.VITE_AWS_ACCESS_KEY_ID && import.meta.env.VITE_AWS_SECRET_ACCESS_KEY) {
@@ -30,37 +30,15 @@ const ddbClient = new DynamoDBClient({
     },
   });
 
-/*
-export async function readFragment(id) {
-    const params = {
-      TableName: import.meta.env.VITE_AWS_DYNAMODB_TABLE_NAME,
-      Key: { id },
-    };
-
-    const command = new GetCommand(params);
-  
-    try {
-
-      const data = await ddbDocClient.send(command);
-
-      return data?.Item;
-    } catch (err) {
-      //logger.warn({ err, params }, 'error reading fragment from DynamoDB');
-      throw err;
-    }
-  }
-  */
 
  export async function listMarkers() {
 
     const params:QueryCommandInput = { TableName: import.meta.env.VITE_AWS_DYNAMODB_TABLE_NAME };
 
   
-    // Create a QUERY command to send to DynamoDB
     const command = new ScanCommand(params);
   
     try {
-      // Wait for the data to come back from AWS
       const data = await ddbDocClient.send(command);
 
       return data?.Items;
@@ -70,14 +48,12 @@ export async function readFragment(id) {
     }
   }
 
-export const writeEntry = (entry) => {
-    // Configure our PUT params, with the name of the table and item (attributes and keys)
+export const writeEntry = (entry:any) => {
     const params = {
       TableName: import.meta.env.VITE_AWS_DYNAMODB_TABLE_NAME,
       Item: entry,
     };
   
-    // Create a PUT command to send to DynamoDB
     const command = new PutCommand(params);
   
     try {
